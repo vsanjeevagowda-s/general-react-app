@@ -12,8 +12,10 @@ class App extends Component {
     }
     this.saveFile = this.saveFile.bind(this);
     this.InputChange = this.InputChange.bind(this);
-    this.readFile = this.readFile.bind(this);
-    this.getStringFromCharCode = this.getStringFromCharCode.bind(this);
+    this.openFile = this.openFile.bind(this);
+    this.openFile = this.openFile.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
+    this.openFolder = this.openFolder.bind(this);
   }
 
   InputChange = (event) => {
@@ -31,21 +33,47 @@ class App extends Component {
         alert('File saved successfully!!');
       })
     })
-  }
-
-  getStringFromCharCode = (str, i) => {
-    return str + String.fromCharCode(i);
   };
 
-  readFile = () => {
-    fs.readFile(localStorage.getItem('filename'), (error, data) => {
-      console.log(data,'data');
-      console.log(error,'error');
+  openFile = () => {
+    dialog.showOpenDialog((fileNames) => {
+      fs.readFile(fileNames[0], 'utf-8', (error, data) => {
         this.setState({
-          dataFromFile: data.reduce(this.getStringFromCharCode, ''),
+          dataFromFile: data,
+        })
       })
     })
+  };
+
+  deleteFile = () => {
+    if (fs.existsSync(localStorage.getItem('filename'))) {
+      fs.unlink(localStorage.getItem('filename'), (err) => {
+        if (err) {
+          alert("An error ocurred updating the file" + err.message);
+          console.log(err);
+          return;
+        }
+        console.log("File succesfully deleted");
+      });
+    } else {
+      alert("This file doesn't exist, cannot delete");
+    }
+  };
+
+  openFolder = () => {
+    dialog.showOpenDialog({
+      title:"Select a folder",
+      properties: ["openDirectory"]
+  }, (folderPaths) => {
+      if(folderPaths === undefined){
+          console.log("No destination folder selected");
+          return;
+      }else{
+          console.log(folderPaths);
+      }
+  });
   }
+
   render() {
     const { data, dataFromFile } = this.state;
     return (
@@ -53,7 +81,9 @@ class App extends Component {
         Save File<br />
         <textarea cols="20" rows="10" id="fileContent" onChange={this.InputChange} value={data}></textarea><br />
         <button onClick={this.saveFile}>SAVE</button><br />
-        <button onClick={this.readFile}>READ FILE</button>
+        <button onClick={this.openFile}>OPEN FILE</button><br />
+        <button onClick={this.deleteFile}>DELETE FILE</button><br />
+        <button onClick={this.openFolder}>OPEN FOLDER</button>
         <p>{dataFromFile}</p>
       </div>
     );

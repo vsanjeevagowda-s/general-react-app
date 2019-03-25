@@ -17,8 +17,8 @@ function createWindow () {
 
   // and load the index.html of the app.
   console.log(mainWindow, 'mainWindow');
-  mainWindow.loadFile('build/index.html')
-  // mainWindow.loadURL('http://localhost:3000/');
+  // mainWindow.loadFile('build/index.html')
+  mainWindow.loadURL('http://localhost:3000/');
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
